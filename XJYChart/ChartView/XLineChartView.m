@@ -59,7 +59,7 @@ NSString* KVOKeyLineGraphMode = @"lineMode";
 
     if ([self.contanierView isKindOfClass:[XAreaLineContainerView class]]) {
       self.bounces = NO;
-      self.backgroundColor = XJYBlue;
+      self.backgroundColor = XJYWhite;
     }
   }
   return self;

@@ -24,70 +24,87 @@
 - (instancetype)initWithFrame:(CGRect)frame
                     topNumber:(NSNumber*)topNumber
                  bottomNumber:(NSNumber*)bottomNumber {
-  if (self = [self initWithFrame:frame]) {
-    self.top = topNumber.floatValue;
-    self.bottom = bottomNumber.floatValue;
-    self.labelArray = [NSMutableArray new];
-    for (int i = 0; i < 4; i++) {
-      UILabel* label = [[UILabel alloc] init];
-      [self.labelArray addObject:label];
+    if (self = [self initWithFrame:frame]) {
+        self.top = topNumber.floatValue;
+        self.bottom = bottomNumber.floatValue;
+        self.labelArray = [NSMutableArray new];
+        for (int i = 0; i < 4; i++) {
+            UILabel* label = [[UILabel alloc] init];
+            [self.labelArray addObject:label];
+        }
+        [self setupUI];
     }
-    [self setupUI];
-  }
-  return self;
+    return self;
 }
 - (instancetype)initWithFrame:(CGRect)frame
                     topNumber:(NSNumber*)topNumber
                  bottomNumber:(NSNumber*)bottomNumber
                 configuration:(XBaseChartConfiguration *)configuration {
-  if (self = [self initWithFrame:frame]) {
-    self.top = topNumber.floatValue;
-    self.bottom = bottomNumber.floatValue;
-    self.labelArray = [NSMutableArray new];
-    self.configuration = configuration;
-    for (int i = 0; i < self.configuration.ordinateDenominator + 1; i++) {
-      UILabel* label = [[UILabel alloc] init];
-      [self.labelArray addObject:label];
+    if (self = [self initWithFrame:frame]) {
+        self.top = topNumber.floatValue;
+        self.bottom = bottomNumber.floatValue;
+        self.labelArray = [NSMutableArray new];
+        self.configuration = configuration;
+        for (int i = 0; i < self.configuration.ordinateDenominator + 1; i++) {
+            UILabel* label = [[UILabel alloc] init];
+            [self.labelArray addObject:label];
+        }
+        [self setupUI];
     }
-    [self setupUI];
-  }
-  return self;
+    return self;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
-  if (self = [super initWithFrame:frame]) {
-  }
-  return self;
+    if (self = [super initWithFrame:frame]) {
+    }
+    return self;
 }
 
 - (void)setupUI {
-  [self.labelArray
-      enumerateObjectsUsingBlock:^(UILabel* _Nonnull obj, NSUInteger idx,
-                                   BOOL* _Nonnull stop) {
-        CGFloat width = self.frame.size.width;
-        
-        //
-        CGFloat newH = ((self.frame.size.height - AbscissaHeight)/(self.labelArray.count - 1)) * (self.labelArray.count - idx - 1);
-          
-        obj.frame = CGRectMake(0, newH, width, 15);
-
-        float largestFontSize = 12;
-//        while ([obj.text sizeWithAttributes:@{NSFontAttributeName:[UIFont systemFontOfSize:largestFontSize]}].width > obj.frame.size.width)
-//        {
-//          largestFontSize--;
-//        }
-//        largestFontSize--;
-
-        obj.font = [UIFont fontWithName:@"AppleSDGothicNeo-Bold" size:largestFontSize];
-        obj.textColor = [UIColor black50PercentColor];
-        obj.text = [NSString
-            stringWithFormat:@"%.0f", (idx) * (self.top - self.bottom) / (self.labelArray.count - 1) +
-                                          self.bottom];
-        obj.textAlignment = NSTextAlignmentCenter;
-        obj.backgroundColor = [UIColor whiteColor];
-
-        [self addSubview:obj];
-      }];
+    [self.labelArray
+     enumerateObjectsUsingBlock:^(UILabel* _Nonnull obj, NSUInteger idx,
+                                  BOOL* _Nonnull stop) {
+         CGFloat width = self.frame.size.width;
+         
+         //
+         CGFloat newH = ((self.frame.size.height - AbscissaHeight)/(self.labelArray.count - 1)) * (self.labelArray.count - idx - 1);
+         
+         obj.frame = CGRectMake(0, newH, width, 15);
+         
+         float largestFontSize = 12;
+         //        while ([obj.text sizeWithAttributes:@{NSFontAttributeName:[UIFont systemFontOfSize:largestFontSize]}].width > obj.frame.size.width)
+         //        {
+         //          largestFontSize--;
+         //        }
+         //        largestFontSize--;
+         
+         obj.font = [UIFont fontWithName:@"AppleSDGothicNeo-Bold" size:largestFontSize];
+         obj.textColor = [UIColor black50PercentColor];
+         obj.text = [NSString
+                     stringWithFormat:@"%.0f", (idx) * (self.top - self.bottom) / (self.labelArray.count - 1) +
+                     self.bottom];
+         obj.textAlignment = NSTextAlignmentCenter;
+         obj.backgroundColor = [UIColor whiteColor];
+         
+         [self addSubview:obj];
+     }];
+    
+    float maxWidth = 0.0;
+    for (size_t i = 0; i < [self.labelArray count]; ++i) {
+        UILabel* label = [self.labelArray objectAtIndex:i];
+        CGSize textSize = [[label text] sizeWithAttributes:@{NSFontAttributeName:[label font]}];
+        CGFloat strikeWidth = textSize.width;
+        if (strikeWidth > maxWidth){
+            maxWidth = strikeWidth;
+        }
+    }
+    for (size_t i = 0; i < [self.labelArray count]; ++i) {
+        UILabel* label = [self.labelArray objectAtIndex:i];
+        [label setFrame:CGRectMake(label.frame.origin.x, label.frame.origin.y,
+                                   maxWidth, label.frame.size.height)];
+    }
+    [self setFrame:CGRectMake(self.frame.origin.x, self.frame.origin.y,
+                              maxWidth, self.frame.size.height)];
 }
 
 @end
